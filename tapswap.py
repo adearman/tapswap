@@ -29,7 +29,7 @@ with open('init_data.txt', 'r') as file:
 # Fungsi untuk login dan mendapatkan token akses serta shares
 def get_access_token_and_shares(init_data_line):
     try:
-        chr_value, actual_init_data = init_data_line.split('|')
+        actual_init_data = init_data_line
     except ValueError:
         print("Format baris tidak valid: ", init_data_line)
         return None, None, None, None
@@ -50,18 +50,17 @@ def get_access_token_and_shares(init_data_line):
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": "Windows",
         "x-app": "tapswap_server",
-        "x-cv": "624",
+        "x-cv": "629",
         "x-bot": "no",
     }
 
     payload = {
         "init_data": actual_init_data,
         "referrer": "",
-        "chr" : int(chr_value),
         "bot_key": "app_bot_0"
     }
     # print(payload)
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    response = requests.post(url, headers=headers, data=json.dumps(payload, separators=(",", ":")))
     if response.status_code == 201:
         data = response.json()
         if 'access_token' in data:
