@@ -87,7 +87,7 @@ def get_access_token_and_shares(init_data_line):
             print(f"{Fore.CYAN+Style.BRIGHT}[ Level Recharge ]: {level_charge}")
             print(f"{Fore.MAGENTA+Style.BRIGHT}[ Free Booster ] : Energy {energy_boost['cnt']} | Turbo : {turbo_boost['cnt']}")
 
-            return access_token, energy, boost_ready, energy_ready
+            return access_token, energy, boost_ready, energy_ready, level_charge
         else:
             print("Token akses tidak ditemukan dalam respons.")
             return None, None, None, None
@@ -225,7 +225,7 @@ else:
 def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, time_stamp, init_data_line):
     global turbo_activated
     tap_count = 0
-    max_upgrade = 0 
+    #max_upgrade = 0 
     while True:
         url = "https://api.tapswap.ai/api/player/submit_taps"
 
@@ -304,6 +304,7 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
                 if tap_count == 20:
                     print(f"\r{Fore.YELLOW+Style.BRIGHT}[ Tap ] : Tapped 20x, ganti akun", flush=True)
                     return
+                '''
                 if use_upgrade == 'y' :
                     max_upgrade += 1
                     # upgrade_level(headers, "tap")
@@ -314,6 +315,7 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
                         if up_charge == False:
                             print(f"\r{Fore.RED+Style.BRIGHT}Recharge sudah level max", flush=True)
                             max_upgrade = 6
+                '''
                 cek_energy = response.json().get("player").get("energy")
                 if cek_energy < 50:
                     if use_booster == 'y':
@@ -619,12 +621,19 @@ while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manua
                     
                  
                     
-                    access_token, energy, boost_ready, energy_ready = get_access_token_and_shares(init_data_line)
+                    access_token, energy, boost_ready, energy_ready, level_charge = get_access_token_and_shares(init_data_line)
                     if access_token is None:
                         print(f"\r{Fore.RED+Style.BRIGHT}Token akses tidak valid, lanjut ke akun berikutnya.", flush=True)
                         continue
 
-                    # if use_upgrade == 'y':
+                    if use_upgrade == 'y':
+                        while True:
+                         if level_charge < 5:
+                             time.sleep(3)
+                             upgrade_level(access_token, upgrade_type="charge")
+                         else:
+                             print(f"\r{Fore.CYAN+Style.BRIGHT}Recharge sudah level {level_charge}.", flush=True)
+                             break
                     #     if random.random() < 0.5:
                     #         upgrade_level(headers={"Authorization": f"Bearer {access_token}"}, upgrade_type="energy")
                     #     else:
