@@ -627,13 +627,16 @@ while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manua
                         continue
 
                     if use_upgrade == 'y':
-                        while True:
-                         if level_charge < 5:
-                             time.sleep(3)
-                             upgrade_level(access_token, upgrade_type="charge")
-                         else:
+                        if level_charge < 5:
+                            while True:
+                                time.sleep(3)
+                                up_charge = upgrade_level(access_token, upgrade_type="charge")
+                                if up_charge == False:
+                                    print(f"\r{Fore.CYAN+Style.BRIGHT}Recharge sudah level {level_charge}.", flush=True)
+                                    break
+                                level_charge += 1
+                        else:
                              print(f"\r{Fore.CYAN+Style.BRIGHT}Recharge sudah level {level_charge}.", flush=True)
-                             break
                     #     if random.random() < 0.5:
                     #         upgrade_level(headers={"Authorization": f"Bearer {access_token}"}, upgrade_type="energy")
                     #     else:
