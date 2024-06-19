@@ -289,7 +289,8 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
                     # upgrade_level(headers, "tap")
                     # upgrade_level(headers, "energy")
                     if max_upgrade < 6:
-                        upgrade_level(headers, "charge")
+                        time.sleep(1)
+                        upgrade_level(access_token, upgrade_type="charge")
                 cek_energy = response.json().get("player").get("energy")
                 if cek_energy < 50:
                     if use_booster == 'y':
