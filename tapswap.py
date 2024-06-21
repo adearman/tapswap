@@ -91,7 +91,7 @@ def get_access_token_and_shares(init_data_line):
             print(f"{Fore.CYAN+Style.BRIGHT}[ Level Recharge ]: {level_charge}")
             print(f"{Fore.MAGENTA+Style.BRIGHT}[ Free Booster ] : Energy {energy_boost['cnt']} | Turbo : {turbo_boost['cnt']}")
 
-            return access_token, energy, boost_ready, energy_ready
+            return access_token, energy, boost_ready, energy_ready, level_charge
         else:
             print("Token akses tidak ditemukan dalam respons.")
             return None, None, None, None
@@ -150,6 +150,26 @@ def apply_turbo_boost(access_token):
 def upgrade_level(headers, upgrade_type):
     for i in range(5):
         print(f"\r{Fore.WHITE+Style.BRIGHT}Upgrading {upgrade_type} {'.' * (i % 4)}", end='', flush=True)
+    headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "*/*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Content-Type": "application/json",
+            "Connection": "keep-alive",
+            "Origin": "https://app.tapswap.club",
+            "Referer": "https://app.tapswap.club/",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "cross-site",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "sec-ch-ua": '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "Windows",
+            "x-app": "tapswap_server",
+            "x-cv": "629",
+            "x-bot": "no",
+            # "Content-Id": content_id
+    }
     url = "https://api.tapswap.ai/api/player/upgrade"
     payload = {"type": upgrade_type}
     response = requests.post(url, headers=headers, json=payload)
@@ -209,7 +229,7 @@ else:
 def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, time_stamp, init_data_line):
     global turbo_activated
     tap_count = 0
-    max_upgrade = 0 
+    #max_upgrade = 0 
     while True:
         url = "https://api.tapswap.ai/api/player/submit_taps"
 
@@ -288,12 +308,18 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
                 if tap_count == 20:
                     print(f"\r{Fore.YELLOW+Style.BRIGHT}[ Tap ] : Tapped 20x, ganti akun", flush=True)
                     return
+                '''
                 if use_upgrade == 'y' :
                     max_upgrade += 1
                     # upgrade_level(headers, "tap")
                     # upgrade_level(headers, "energy")
                     if max_upgrade < 6:
-                        upgrade_level(headers, "charge")
+                        time.sleep(1)
+                        up_charge = upgrade_level(access_token, upgrade_type="charge")
+                        if up_charge == False:
+                            print(f"\r{Fore.RED+Style.BRIGHT}Recharge sudah level max", flush=True)
+                            max_upgrade = 6
+                '''
                 cek_energy = response.json().get("player").get("energy")
                 if cek_energy < 50:
                     if use_booster == 'y':
@@ -599,12 +625,22 @@ while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manua
                     
                  
                     
-                    access_token, energy, boost_ready, energy_ready = get_access_token_and_shares(init_data_line)
+                    access_token, energy, boost_ready, energy_ready, level_charge = get_access_token_and_shares(init_data_line)
                     if access_token is None:
                         print(f"\r{Fore.RED+Style.BRIGHT}Token akses tidak valid, lanjut ke akun berikutnya.", flush=True)
                         continue
 
-                    # if use_upgrade == 'y':
+                    if use_upgrade == 'y':
+                        if level_charge < 5:
+                            while True:
+                                time.sleep(3)
+                                up_charge = upgrade_level(access_token, upgrade_type="charge")
+                                if up_charge == False:
+                                    print(f"\r{Fore.CYAN+Style.BRIGHT}Recharge sudah level {level_charge}.", flush=True)
+                                    break
+                                level_charge += 1
+                        else:
+                             print(f"\r{Fore.CYAN+Style.BRIGHT}Recharge sudah level {level_charge}.", flush=True)
                     #     if random.random() < 0.5:
                     #         upgrade_level(headers={"Authorization": f"Bearer {access_token}"}, upgrade_type="energy")
                     #     else:
